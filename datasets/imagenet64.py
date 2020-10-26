@@ -32,15 +32,15 @@ class ImageNet64(Dataset):
         else:
             with open(osp.join(root, 'val_data'), 'rb') as f:
                 dump = pickle.load(f)
-            with open(osp.join(root, 'eval.pickle'), 'rb') as f:
-                querylabel = pickle.load(f)
-                dump['labels'] = [label.argmax() for label in querylabel]
+            # with open(osp.join(root, 'eval.pickle'), 'rb') as f:
+            #     querylabel = pickle.load(f)
+            #     dump['labels'] = [label.argmax() for label in querylabel]
 
         data = dump['data']
         labels = dump['labels']
         img_size = 64
         img_size2 = img_size * img_size
-
+        self.classes = ['{}'.format(i) for i in range(1000)]
         data = np.dstack((data[:, :img_size2], data[:, img_size2:2 * img_size2], data[:, 2 * img_size2:]))
         data = data.reshape((data.shape[0], img_size, img_size, 3))
 

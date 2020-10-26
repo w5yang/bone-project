@@ -41,9 +41,9 @@ class Adversary(object):
 
     def train(self, samples=None):
         if samples is None:
-            self.model.train(self.sampler)
+            self.model.train(self.sampler, suffix='.{}'.format(len(self.sampler)))
         else:
-            self.model.train(samples)
+            self.model.train(samples, suffix='.{}'.format(len(samples)))
 
     def choose(self, method: str, budget: int):
         if method == 'random':

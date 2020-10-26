@@ -136,11 +136,11 @@ class BalanceAdversary(Adversary):
             while len(chosen) < budget:
                 current_index = arg_penalty[current]
                 i, j = direction_list[current_index]
-                if self.temp_penalty[i, j] == 0:
+                if self.temp_penalty[i, j] == 0 and current_index not in punished:
                     chosen.add(current_index)
                     self.punish(i, j)
                     current += 1
-                elif current_index in punished:
+                elif current_index not in punished:
                     chosen.add(current_index)
                     self.punish(i, j)
                     current += 1
@@ -188,14 +188,14 @@ def main():
     parser.add_argument('--method', metavar='M', type=str, help='Determine sample/synthetic method.',
                                default='balance', choices=['balance', 'deepfool', 'random'])
     args = parser.parse_args()
-    adversary = BalanceAdversary(args, test=True)
-    adversary.choose('random', 500)
-
+    adversary = BalanceAdversary(args, test=False)
+    adversary.choose('random', 5000)
     adversary.train()
     for i in range(10):
         adversary.choose(args.method, 500)
         adversary.train()
     np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix.npy'), adversary.statistic)
+    np.save(os.path.join(adversary.sampler.indices, 'selected.npy'))
 
 
 if __name__ == '__main__':
