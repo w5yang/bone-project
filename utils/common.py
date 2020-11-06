@@ -166,17 +166,30 @@ class QuerySubset(Subset):
     ):
         self.labels = list(labels)
         super(QuerySubset, self).__init__(dataset, indices, num_classes, state_path)
+        self.__indices = self.indices[:]
 
     def __getitem__(self, item):
-        return self.dataset[self.indices[item]][0], self.labels[item]
+        return self.dataset[self.__indices[item]][0], self.labels[item]
+
+    def __len__(self):
+        return len(self.__indices)
 
     def extend(self, indices, new_labels=None, *args, **kwargs):
-        assert len(indices) == len(new_labels)
+        if new_labels is None:
+            tempset = set(self.indices)
+            for i in indices:
+                if i not in tempset:
+                    self.indices.append(i)
+                    tempset.add(i)
+            return
+        else:
+            assert len(indices) == len(new_labels)
         warned = False
         tempset = set(self.indices)
         for i, label in zip(indices, new_labels):
             if i not in tempset:
                 self.indices.append(i)
+                self.__indices.append(i)
                 self.labels.append(label)
                 tempset.add(i)
             elif not warned:
