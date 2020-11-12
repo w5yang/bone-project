@@ -17,10 +17,11 @@ class Adversary(object):
                  **kwargs):
         # keep a backup of args
         self.args = args
-        params = vars(args)
+        self.params = vars(args)
         self.device = device_dealer(args.device_id)
-        self.model = Model(device=self.device, **params)
+        self.model = Model(device=self.device, **self.params)
         self.sampler = Subset.from_args(args)
+        self.method = args.method
         if args.pseudoblackbox and args.bydataset:
             # This may work, but is poorly designed.
             self.blackbox = PseudoBlackbox(self.sampler.dataset, args.argmax)
@@ -40,13 +41,14 @@ class Adversary(object):
             return query(self.blackbox, x, device=self.device)
 
     def train(self, samples=None):
+        self.model = Model(device=self.device, **self.params)
         if samples is None:
             self.model.train(self.sampler, suffix='.{}'.format(len(self.sampler)))
         else:
             self.model.train(samples, suffix='.{}'.format(len(samples)))
 
-    def choose(self, method: str, budget: int):
-        if method == 'random':
+    def choose(self, budget: int):
+        if self.method == 'random':
             unselected = list(set(range(len(self.sampler.dataset))).difference(self.sampler.indices))
             selecting = np.random.permutation(unselected)[:budget]
             if isinstance(self.sampler, QuerySubset):
@@ -64,6 +66,8 @@ def main():
     parser_dealer(parser, 'train')
     parser_dealer(parser, 'common')
     args = parser.parse_args()
+    parser.add_argument('--method', metavar='M', type=str, help='Determine sample/synthetic method.',
+                        default='balance', choices=['random'])
     adversary = Adversary(
         args
     )

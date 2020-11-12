@@ -447,6 +447,15 @@ class Model(object):
                 af.write('\t'.join([str(c) for c in test_cols]) + '\n')
 
     def __call__(self, x):
+        """ This calling method is specially designed for model evaluation.
+
+        Args:
+            x: Tensor
+
+        Returns: Raw logits.
+
+        """
+        self.model.eval()
         return self.model(x)
 
     def forward(self, x):

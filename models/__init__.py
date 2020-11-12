@@ -6,7 +6,7 @@ sized_transforms = {
     32: transforms.Compose([
         transforms.Resize([32,32]),
         transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
+        # transforms.Normalize((0.1307,), (0.3081,))
     ]),
     224: transforms.Compose([
         transforms.RandomResizedCrop(224),

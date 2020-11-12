@@ -1,5 +1,6 @@
 import os
 import os.path as osp
+import random
 
 from typing import List, Tuple, Union, Sequence
 # from overloading import overload
@@ -80,6 +81,13 @@ class Subset(Dataset):
         else:
             return None
 
+    def append(self, index, *args, **kwargs):
+        if index in self.indices:
+            warnings.warn('Duplicated index')
+            return
+        else:
+            self.indices.append(index)
+
     def extend(self, indices, *args, **kwargs):
         warned = False
         tempset = set(self.indices)
@@ -90,6 +98,12 @@ class Subset(Dataset):
             elif not warned:
                 warnings.warn('There is duplication in extended list')
                 warned = True
+
+    def convert_indices(self, indices) -> List:
+        real_indices = []
+        for i in indices:
+            real_indices.append(self.indices[i])
+        return real_indices
 
     @classmethod
     def from_args(cls, args: Namespace):
@@ -122,20 +136,13 @@ class Subset(Dataset):
             save_selection_state(self, state_path, suffix, budget)
 
 
-class Complement(Dataset):
+class Complement(Subset):
     def __init__(self, subset: Subset):
-        self.dataset = subset.dataset
-        self.dataset_name = subset.dataset_name
         self.subset = subset
-
-    def __len__(self):
-        return len(self.dataset) - len(self.subset)
-
-    def __getitem__(self, item):
-        current = set([i for i in range(len(self.dataset))])
-        current.difference_update(self.subset.indices)
-        index = list(current)[item]
-        return self.dataset[index]
+        indice_set = set([i for i in range(len(subset.dataset))])
+        indice_set.difference_update(subset.indices)
+        indices = list(indice_set)
+        super(Complement, self).__init__(subset.dataset, indices, subset.num_classes, subset.state_path)
 
 
 class Queryset(Dataset):
@@ -193,8 +200,19 @@ class QuerySubset(Subset):
                 self.labels.append(label)
                 tempset.add(i)
             elif not warned:
-                    warnings.warn('There is duplication in extended list')
-                    warned = True
+                warnings.warn('There is duplication in extended list')
+                warned = True
+
+    def append(self, index, label=None, *args, **kwargs):
+        if label is None:
+            self.indices.append(index)
+        else:
+            if index in self.indices:
+                warnings.warn('Duplication index')
+                return
+            self.indices.append(index)
+            self.__indices.append(index)
+            self.labels.append(label)
 
 
 class PseudoBlackbox(object):
@@ -559,3 +577,11 @@ def create_dir(dir_path):
     if not osp.exists(dir_path):
         print('Path {} does not exist. Creating it...'.format(dir_path))
         os.makedirs(dir_path)
+
+
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True

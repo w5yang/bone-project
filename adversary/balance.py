@@ -189,11 +189,7 @@ class BalanceAdversary(Adversary):
             while len(chosen) < budget:
                 current_index = arg_penalty[current]
                 i, j = direction_list[current_index]
-                if self.temp_penalty[i, j] == 0 and current_index not in punished:
-                    chosen.add(current_index)
-                    self.punish(i, j)
-                    current += 1
-                elif current_index not in punished:
+                if self.temp_penalty[i, j] == 0 or current_index in punished:
                     chosen.add(current_index)
                     self.punish(i, j)
                     current += 1
