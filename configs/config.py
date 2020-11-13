@@ -10,7 +10,7 @@ CONFIG_PATH = abspath(__file__)
 SRC_ROOT = dirname(CONFIG_PATH)
 PROJECT_ROOT = dirname(SRC_ROOT)
 CACHE_ROOT = osp.join(SRC_ROOT, 'cache')
-DATASET_ROOT = osp.join('/mnt/ywb/', 'Dataset')
+DATASET_ROOT = osp.join('/home/ww/', 'dataset')
 DEBUG_ROOT = osp.join(PROJECT_ROOT, 'debug')
 MODEL_DIR = osp.join(PROJECT_ROOT, 'results', 'models')
 

@@ -9,13 +9,12 @@ from PIL import Image
 
 
 class ImageNet64(Dataset):
-    """Define Imagenet downscale dataset, the experiments of this paper only covered the downscaled version of ImageNet
-       Dataset, and we only select the first one of the total 10 training batch as ImageNet queryset.
+    """Define Imagenet downscale dataset
 
     """
 
     def __init__(self, train: bool = True, transform: Callable = None, target_transform: Callable = None):
-        root = osp.join(cfg.DATASET_ROOT, 'Imagenet64')
+        root = osp.join(cfg.DATASET_ROOT, 'ImageNet64')
         self.transform = transform
         self.target_transform = target_transform
         if not osp.exists(root):
@@ -32,15 +31,13 @@ class ImageNet64(Dataset):
         else:
             with open(osp.join(root, 'val_data'), 'rb') as f:
                 dump = pickle.load(f)
-            # with open(osp.join(root, 'eval.pickle'), 'rb') as f:
-            #     querylabel = pickle.load(f)
-            #     dump['labels'] = [label.argmax() for label in querylabel]
+
 
         data = dump['data']
         labels = dump['labels']
         img_size = 64
         img_size2 = img_size * img_size
-        self.classes = ['{}'.format(i) for i in range(1000)]
+
         data = np.dstack((data[:, :img_size2], data[:, img_size2:2 * img_size2], data[:, 2 * img_size2:]))
         data = data.reshape((data.shape[0], img_size, img_size, 3))
 

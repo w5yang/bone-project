@@ -37,9 +37,8 @@ class GTSRB(ImageFolder):
 
     def read_test(self, folder):
         with open(osp.join(folder, 'GT-final_test.csv')) as f:
-            f.readline()
             for line in f:
-                image, _, _, _, _, _, _, label = line.strip().split(';')
+                image, _, _, _, _, _, _, label = line.strip().split(',')
                 path = osp.join(folder, image)
                 self.samples.append((path, int(label)))
                 self.targets.append(int(label))
