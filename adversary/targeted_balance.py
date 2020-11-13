@@ -65,7 +65,7 @@ class TargetBalance(Adversary):
         selecting_pool = Complement(self.sampler)
         perturbations = []
         directions = []
-        self.temp_penalty = np.zeros((self.sampler.num_classes, self.sampler.num_classes))
+        self.temp_penalty = np.zeros([self.num_classes, self.num_classes])
         with tqdm(total=len(selecting_pool)) as pbar:
             for x_t, y_t in DataLoader(selecting_pool, self.model.batch_size, True):
                 y = self.model(x_t.to(self.device)).argmax(1)
