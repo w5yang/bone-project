@@ -24,14 +24,14 @@ class TargetBalance(Adversary):
             self.verbose = True
         self.num_classes = len(self.model.testset.classes)
         self.penalty_standard = []
-        self.penalty_matrix = np.zeros((self.sampler.num_classes, self.sampler.num_classes))
-        self.temp_penalty = np.zeros((self.sampler.num_classes, self.sampler.num_classes))
+        self.penalty_matrix = np.zeros((self.num_classes, self.num_classes))
+        self.temp_penalty = np.zeros((self.num_classes, self.num_classes))
         self.statistic = np.zeros((self.num_classes, self.num_classes), dtype=int)
         self.max_iter = 200
         self.overshoot = .02
         self.max_select_per_direction = 100
         self.synthetic = []
-        self.attacker: Attack = torchattacks.CW(self.model.model, c=1.0)
+        self.attacker: Attack = torchattacks.CW(self.model.model, c=0.5, steps=50)
         self.attacker.set_attack_mode('targeted')
 
     def punish(self, i, j):
@@ -39,13 +39,15 @@ class TargetBalance(Adversary):
         k = int(len(self.penalty_standard) * self.statistic[i, j] / self.max_select_per_direction) - 1
         if self.verbose:
             print('Punish i={}, j={}, k={}'.format(i, j, k))
-            if k > len(self.sampler.dataset):
+            if k > len(self.penalty_standard):
                 print('Overflow')
         if k < len(self.penalty_standard):
             self.temp_penalty[i, j] = self.penalty_standard[k] - self.penalty_standard[0] - self.penalty_matrix[i, j]
-            self.penalty_matrix[i, j] = self.penalty_standard[k] - self.penalty_standard[0]
+            assert self.temp_penalty[i, j] > 0
+            # self.penalty_matrix[i, j] = self.penalty_standard[k] - self.penalty_standard[0]
         else:
-            self.penalty_matrix[i, j] = np.inf
+            # self.penalty_matrix[i, j] = np.inf
+            self.temp_penalty[i, j] = np.inf
         if self.verbose:
             if self.penalty_matrix[i, j] == np.inf:
                 print('({}, {}) are never selected.'.format(i, j))
@@ -55,6 +57,9 @@ class TargetBalance(Adversary):
             if self.direction_tensor[index].tolist() == [i, j]:
                 repunish.append(index)
         self.punished.difference_update(repunish)
+
+    def update_penalty_matrix(self):
+        self.penalty_matrix += self.temp_penalty
 
     def choose(self, budget: int):
         selecting_pool = Complement(self.sampler)
@@ -103,6 +108,7 @@ class TargetBalance(Adversary):
         real_chosen = selecting_pool.convert_indices(chosen)
         labels = self.query_tensor(QueryWrapper(self.sampler.dataset, real_chosen))
         self.sampler.extend(real_chosen, labels)
+        self.update_penalty_matrix()
 
 
 def main():
@@ -128,8 +134,10 @@ def main():
                 adversary.sampler.dataset.convert_indices(adversary.sampler.indices))
         # np.save(os.path.join(adversary.model.model_dir, 'synthetic_.npy'),
         #         [(tensor.numpy(), result.numpy()) for tensor, result in adversary.synthetic])
+
+        np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix_.npy'), adversary.statistic)
         adversary.train()
-    np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix_.npy'), adversary.statistic)
+
 
 
 if __name__ == '__main__':

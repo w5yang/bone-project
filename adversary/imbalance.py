@@ -31,7 +31,7 @@ class Imbalance(Adversary):
         self.overshoot = .02
         self.max_select_per_direction = 100
         self.synthetic = []
-        self.attacker: Attack = torchattacks.CW(self.model.model, c=1.0)
+        self.attacker: Attack = torchattacks.CW(self.model.model, c=0.5, steps=50)
         self.attacker.set_attack_mode('least_likely')
 
     def choose(self, budget: int):
@@ -102,8 +102,8 @@ def main():
         adversary.choose(500)
         # todo this line should be rechecked once the test argument is removed.
         np.save(os.path.join(adversary.model.model_dir, 'selected_.npy'), adversary.sampler.dataset.convert_indices(adversary.sampler.indices))
-        np.save(os.path.join(adversary.model.model_dir, 'synthetic_.npy'),
-                [(tensor.numpy(), result.numpy()) for tensor, result in adversary.synthetic])
+        # np.save(os.path.join(adversary.model.model_dir, 'synthetic_.npy'),
+        #         [(tensor.numpy(), result.numpy()) for tensor, result in adversary.synthetic])
         adversary.train()
     np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix_.npy'), adversary.statistic)
 
