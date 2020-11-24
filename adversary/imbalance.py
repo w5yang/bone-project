@@ -18,9 +18,11 @@ class Imbalance(Adversary):
         super(Imbalance, self).__init__(args)
 
         self.verbose = False
-        if kwargs['test']:
+        if kwargs["test"]:
             perm = np.random.permutation(len(self.sampler.dataset))
-            self.sampler.dataset = Subset(self.sampler.dataset, [i for i in perm[:10000]])
+            self.sampler.dataset = Subset(
+                self.sampler.dataset, [i for i in perm[:10000]]
+            )
             self.verbose = True
         self.num_classes = len(self.model.testset.classes)
         # self.penalty_standard = []
@@ -28,11 +30,11 @@ class Imbalance(Adversary):
         # self.temp_penalty = torch.zeros((self.sampler.num_classes, self.sampler.num_classes))
         self.statistic = torch.zeros((self.num_classes, self.num_classes), dtype=int)
         self.max_iter = 200
-        self.overshoot = .02
+        self.overshoot = 0.02
         self.max_select_per_direction = 100
         self.synthetic = []
         self.attacker: Attack = torchattacks.CW(self.model.model, c=0.5, steps=50)
-        self.attacker.set_attack_mode('least_likely')
+        self.attacker.set_attack_mode("original")
 
     def choose(self, budget: int):
         selecting_pool = Complement(self.sampler)
@@ -83,30 +85,44 @@ class Imbalance(Adversary):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model in a distillation manner.')
+    parser = argparse.ArgumentParser(
+        description="Train a model in a distillation manner."
+    )
     # Required arguments
-    parser_dealer(parser, 'blackbox')
-    parser_dealer(parser, 'sampling')
-    parser_dealer(parser, 'train')
-    parser_dealer(parser, 'common')
-    parser.add_argument('--method', metavar='M', type=str, help='Determine sample/synthetic method.',
-                        default='CW', choices=['CW'])
+    parser_dealer(parser, "blackbox")
+    parser_dealer(parser, "sampling")
+    parser_dealer(parser, "train")
+    parser_dealer(parser, "common")
+    parser.add_argument(
+        "--method",
+        metavar="M",
+        type=str,
+        help="Determine sample/synthetic method.",
+        default="CW",
+        choices=["CW"],
+    )
     args = parser.parse_args()
     setup_seed(0)
-    adversary = Imbalance(args, test=True)
+    adversary = Imbalance(args, test=False)
     selecting = np.random.permutation(len(adversary.sampler.dataset))[:1000]
     labels = adversary.query_tensor(QueryWrapper(adversary.sampler.dataset, selecting))
     adversary.sampler.extend(selecting, labels)
     adversary.train()
-    for i in range(10):
+    for i in range(48):
         adversary.choose(500)
         # todo this line should be rechecked once the test argument is removed.
-        np.save(os.path.join(adversary.model.model_dir, 'selected_.npy'), adversary.sampler.dataset.convert_indices(adversary.sampler.indices))
+        np.save(
+            os.path.join(adversary.model.model_dir, "selected_.npy"),
+            adversary.sampler.indices,
+        )
         # np.save(os.path.join(adversary.model.model_dir, 'synthetic_.npy'),
         #         [(tensor.numpy(), result.numpy()) for tensor, result in adversary.synthetic])
         adversary.train()
-    np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix_.npy'), adversary.statistic)
+    np.save(
+        os.path.join(adversary.model.model_dir, "statistic_matrix_.npy"),
+        adversary.statistic,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

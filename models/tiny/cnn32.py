@@ -1,13 +1,11 @@
 import torch.nn as nn
 from collections import OrderedDict
 
-__all__ = ['cnn32', 'cnn42']
+__all__ = ["cnn32", "cnn42"]
 
 
 class CNN32(nn.Module):
-    """A typical cnn model originated from ActiveThief.
-
-    """
+    """A typical cnn model originated from ActiveThief."""
 
     def __init__(self, num_classes=43, channel=3, **kwargs):
         super(CNN32, self).__init__()
@@ -27,22 +25,26 @@ class CNN32(nn.Module):
 
 
 def make_conv_block(inplane: int, num_filter) -> nn.Module:
-    block = nn.Sequential(OrderedDict([
-        ('conv1', nn.Conv2d(inplane, num_filter, 3, 1, 1)),
-        ('relu1', nn.ReLU()),
-        ('bn1', nn.BatchNorm2d(num_filter, eps=1e-3, momentum=0.99)),
-        ('conv2', nn.Conv2d(num_filter, num_filter, 3, 1, 1)),
-        ('relu2', nn.ReLU()),
-        ('bn2', nn.BatchNorm2d(num_filter, eps=1e-3, momentum=0.99)),
-        ('mp1', nn.MaxPool2d(2, 2)),
-        ('do1', nn.Dropout2d(p=0.5)),
-    ])
+    block = nn.Sequential(
+        OrderedDict(
+            [
+                ("conv1", nn.Conv2d(inplane, num_filter, 3, 1, 1)),
+                ("relu1", nn.ReLU()),
+                ("bn1", nn.BatchNorm2d(num_filter, eps=1e-3, momentum=0.99)),
+                ("conv2", nn.Conv2d(num_filter, num_filter, 3, 1, 1)),
+                ("relu2", nn.ReLU()),
+                ("bn2", nn.BatchNorm2d(num_filter, eps=1e-3, momentum=0.99)),
+                ("mp1", nn.MaxPool2d(2, 2)),
+                ("do1", nn.Dropout2d(p=0.5)),
+            ]
+        )
     )
     return block
 
 
 def cnn32(num_classes, **kwargs):
     return CNN32(num_classes, **kwargs)
+
 
 class CNN42(nn.Module):
     def __init__(self, num_classes=43, channel=3, **kwargs):
@@ -62,6 +64,7 @@ class CNN42(nn.Module):
         x = self.fc(x)
 
         return x
+
 
 def cnn42(num_classes, **kwargs):
     return CNN42(num_classes, **kwargs)

@@ -9,13 +9,13 @@ DS_SEED = 123  # uses this seed when splitting datasets
 CONFIG_PATH = abspath(__file__)
 SRC_ROOT = dirname(CONFIG_PATH)
 PROJECT_ROOT = dirname(SRC_ROOT)
-CACHE_ROOT = osp.join(SRC_ROOT, 'cache')
-DATASET_ROOT = osp.join('/mnt/ywb/', 'Dataset')
-DEBUG_ROOT = osp.join(PROJECT_ROOT, 'debug')
-MODEL_DIR = osp.join(PROJECT_ROOT, 'results', 'models')
+CACHE_ROOT = osp.join(SRC_ROOT, "cache")
+DATASET_ROOT = osp.join("/mnt/ywb/", "Dataset")
+DEBUG_ROOT = osp.join(PROJECT_ROOT, "debug")
+MODEL_DIR = osp.join(PROJECT_ROOT, "results", "models")
 
 # -------------- URLs
-ZOO_URL = 'http://datasets.d2.mpi-inf.mpg.de/blackboxchallenge'
+ZOO_URL = "http://datasets.d2.mpi-inf.mpg.de/blackboxchallenge"
 
 # -------------- Dataset Stuff
 IMAGENET_MEAN = [0.485, 0.456, 0.406]

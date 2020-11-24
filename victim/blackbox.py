@@ -18,7 +18,7 @@ __status__ = "Development"
 
 class Blackbox(object):
     def __init__(self, model, device=None, topk=None, rounding=None):
-        self.device = torch.device('cuda') if device is None else device
+        self.device = torch.device("cuda") if device is None else device
         self.topk = topk
         self.rounding = rounding
 
@@ -29,33 +29,41 @@ class Blackbox(object):
 
     @classmethod
     def from_modeldir(cls, model_dir, device=None, topk=None, rounding=None):
-        device = torch.device('cuda') if device is None else device
+        device = torch.device("cuda") if device is None else device
 
         # What was the model architecture used by this model?
-        params_path = osp.join(model_dir, 'params.json')
+        params_path = osp.join(model_dir, "params.json")
         with open(params_path) as jf:
             params = json.load(jf)
-        model_arch = params['model_arch']
-        input_size = params['input_size']
-        num_classes = params['num_classes']
-        channel = params['channel']
-        complexity = params['complexity']
+        model_arch = params["model_arch"]
+        input_size = params["input_size"]
+        num_classes = params["num_classes"]
+        channel = params["channel"]
+        complexity = params["complexity"]
 
         # Instantiate the model
-        model = zoo.get_net(model_arch, input_size, pretrained=None, num_classes=num_classes,
-                            channel=channel, complexity=complexity)
+        model = zoo.get_net(
+            model_arch,
+            input_size,
+            pretrained=None,
+            num_classes=num_classes,
+            channel=channel,
+            complexity=complexity,
+        )
         model = model.to(device)
 
         # Load weights
-        checkpoint_path = osp.join(model_dir, 'model_best.pth.tar')
+        checkpoint_path = osp.join(model_dir, "model_best.pth.tar")
         if not osp.exists(checkpoint_path):
-            checkpoint_path = osp.join(model_dir, 'checkpoint.pth.tar')
+            checkpoint_path = osp.join(model_dir, "checkpoint.pth.tar")
         print("=> loading checkpoint '{}'".format(checkpoint_path))
         checkpoint = torch.load(checkpoint_path)
-        epoch = checkpoint['epoch']
-        best_test_acc = checkpoint['best_acc']
-        model.load_state_dict(checkpoint['state_dict'])
-        print("=> loaded checkpoint (epoch {}, acc={:.2f})".format(epoch, best_test_acc))
+        epoch = checkpoint["epoch"]
+        best_test_acc = checkpoint["best_acc"]
+        model.load_state_dict(checkpoint["state_dict"])
+        print(
+            "=> loaded checkpoint (epoch {}, acc={:.2f})".format(epoch, best_test_acc)
+        )
 
         blackbox = cls(model, device, topk, rounding)
         return blackbox
@@ -74,7 +82,9 @@ class Blackbox(object):
 
         # Rounding of decimals
         if self.rounding is not None:
-            y_t_probs = torch.Tensor(np.round(y_t_probs.numpy(), decimals=self.rounding))
+            y_t_probs = torch.Tensor(
+                np.round(y_t_probs.numpy(), decimals=self.rounding)
+            )
 
         return y_t_probs
 

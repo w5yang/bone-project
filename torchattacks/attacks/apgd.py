@@ -8,7 +8,7 @@ class APGD(Attack):
     r"""
     Comment on "Adv-BNN: Improved Adversarial Defense through Robust Bayesian Neural Network"
     [https://arxiv.org/abs/1907.00895]
-    
+
     Distance Measure : Linf
 
     Arguments:
@@ -28,7 +28,8 @@ class APGD(Attack):
         >>> adv_images = attack(images, labels)
 
     """
-    def __init__(self, model, eps=0.3, alpha=2/255, steps=40, sampling=10):
+
+    def __init__(self, model, eps=0.3, alpha=2 / 255, steps=40, sampling=10):
         super(APGD, self).__init__("APGD", model)
         self.eps = eps
         self.alpha = alpha
@@ -54,14 +55,14 @@ class APGD(Attack):
             for j in range(self.sampling):
 
                 outputs = self.model(images)
-                cost = self._targeted*loss(outputs, labels).to(self.device)
+                cost = self._targeted * loss(outputs, labels).to(self.device)
 
-                grad += torch.autograd.grad(cost, images,
-                                            retain_graph=False,
-                                            create_graph=False)[0]
+                grad += torch.autograd.grad(
+                    cost, images, retain_graph=False, create_graph=False
+                )[0]
 
             # grad.sign() is used instead of (grad/sampling).sign()
-            adv_images = images + self.alpha*grad.sign()
+            adv_images = images + self.alpha * grad.sign()
             eta = torch.clamp(adv_images - ori_images, min=-self.eps, max=self.eps)
             images = torch.clamp(ori_images + eta, min=0, max=1).detach()
 

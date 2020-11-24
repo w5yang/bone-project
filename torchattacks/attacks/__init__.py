@@ -1,6 +1,6 @@
 from .fgsm import FGSM
 from .bim import BIM
-from .rfgsm import RFGSM 
+from .rfgsm import RFGSM
 from .cw import CW
 from .pgd import PGD
 from .apgd import APGD

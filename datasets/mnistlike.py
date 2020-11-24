@@ -9,39 +9,45 @@ import configs.config as cfg
 
 
 class MNIST(TVMNIST):
-    def __init__(self, train=True, transform=None, target_transform=None, download=True):
-        root = osp.join(cfg.DATASET_ROOT, 'mnist')
+    def __init__(
+        self, train=True, transform=None, target_transform=None, download=True
+    ):
+        root = osp.join(cfg.DATASET_ROOT, "mnist")
         self.num_classes = 10
         super().__init__(root, train, transform, target_transform, download)
 
 
 class KMNIST(TVKMNIST):
-    def __init__(self, train=True, transform=None, target_transform=None, download=True):
-        root = osp.join(cfg.DATASET_ROOT, 'kmnist')
+    def __init__(
+        self, train=True, transform=None, target_transform=None, download=True
+    ):
+        root = osp.join(cfg.DATASET_ROOT, "kmnist")
         self.num_classes = 10
         super().__init__(root, train, transform, target_transform, download)
 
 
 class EMNIST(TVEMNIST):
     def __init__(self, **kwargs):
-        root = osp.join(cfg.DATASET_ROOT, 'emnist')
+        root = osp.join(cfg.DATASET_ROOT, "emnist")
         self.num_classes = 10
-        super().__init__(root, split='balanced', download=True, **kwargs)
+        super().__init__(root, split="balanced", download=True, **kwargs)
         # Images are transposed by default. Fix this.
         self.data = self.data.permute(0, 2, 1)
 
 
 class EMNISTLetters(TVEMNIST):
     def __init__(self, **kwargs):
-        root = osp.join(cfg.DATASET_ROOT, 'emnist')
+        root = osp.join(cfg.DATASET_ROOT, "emnist")
         self.num_classes = 10
-        super().__init__(root, split='letters', download=True, **kwargs)
+        super().__init__(root, split="letters", download=True, **kwargs)
         # Images are transposed by default. Fix this.
         self.data = self.data.permute(0, 2, 1)
 
 
 class FashionMNIST(TVFashionMNIST):
-    def __init__(self, train=True, transform=None, target_transform=None, download=True):
-        root = osp.join(cfg.DATASET_ROOT, 'mnist_fashion')
+    def __init__(
+        self, train=True, transform=None, target_transform=None, download=True
+    ):
+        root = osp.join(cfg.DATASET_ROOT, "mnist_fashion")
         self.num_classes = 10
         super().__init__(root, train, transform, target_transform, download)

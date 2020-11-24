@@ -18,9 +18,11 @@ class TargetBalance(Adversary):
         super(TargetBalance, self).__init__(args)
 
         self.verbose = False
-        if kwargs['test']:
+        if kwargs["test"]:
             perm = np.random.permutation(len(self.sampler.dataset))
-            self.sampler.dataset = Subset(self.sampler.dataset, [i for i in perm[:10000]])
+            self.sampler.dataset = Subset(
+                self.sampler.dataset, [i for i in perm[:10000]]
+            )
             self.verbose = True
         self.num_classes = len(self.model.testset.classes)
         self.penalty_standard = []
@@ -28,29 +30,45 @@ class TargetBalance(Adversary):
         self.temp_penalty = np.zeros((self.num_classes, self.num_classes))
         self.statistic = np.zeros((self.num_classes, self.num_classes), dtype=int)
         self.max_iter = 200
-        self.overshoot = .02
-        self.max_select_per_direction = 100
+        self.overshoot = 0.02
+        self.max_select_per_direction = 2000
         self.synthetic = []
         self.attacker: Attack = torchattacks.CW(self.model.model, c=0.5, steps=50)
-        self.attacker.set_attack_mode('targeted')
+        self.attacker.set_attack_mode("targeted")
 
     def punish(self, i, j):
         self.statistic[i, j] += 1
-        k = int(len(self.penalty_standard) * self.statistic[i, j] / self.max_select_per_direction) - 1
+        k = (
+            int(
+                len(self.penalty_standard)
+                * self.statistic[i, j]
+                / self.max_select_per_direction
+            )
+            - 1
+        )
         if self.verbose:
-            print('Punish i={}, j={}, k={}'.format(i, j, k))
+            print("Punish i={}, j={}, k={}".format(i, j, k))
             if k > len(self.penalty_standard):
-                print('Overflow')
+                print("Overflow")
         if k < len(self.penalty_standard):
-            self.temp_penalty[i, j] = self.penalty_standard[k] - self.penalty_standard[0] - self.penalty_matrix[i, j]
-            assert self.temp_penalty[i, j] > 0
-            # self.penalty_matrix[i, j] = self.penalty_standard[k] - self.penalty_standard[0]
+            self.temp_penalty[i, j] = (
+                self.penalty_standard[k]
+                - self.penalty_standard[0]
+                - self.penalty_matrix[i, j]
+            )
+            # assert self.temp_penalty[i, j] > 0
+            if self.temp_penalty[i, j] < 0:
+                print("Penalty variation")
+                self.temp_penalty[i, j] = 0
+                self.penalty_matrix[i, j] = (
+                    self.penalty_standard[k] - self.penalty_standard[0]
+                )
         else:
             # self.penalty_matrix[i, j] = np.inf
             self.temp_penalty[i, j] = np.inf
         if self.verbose:
             if self.penalty_matrix[i, j] == np.inf:
-                print('({}, {}) are never selected.'.format(i, j))
+                print("({}, {}) are never selected.".format(i, j))
         # repunish tensor that has been already punished.
         repunish = []
         for index in self.punished:
@@ -102,7 +120,9 @@ class TargetBalance(Adversary):
                 self.punish(i, j)
                 current += 1
             else:
-                perturbation_array[current] = perturbation_clone[current_index] + self.temp_penalty[i, j]
+                perturbation_array[current] = (
+                    perturbation_clone[current_index] + self.temp_penalty[i, j]
+                )
                 sorted_indices = perturbation_array.argsort()
                 self.punished.add(current_index)
         real_chosen = selecting_pool.convert_indices(chosen)
@@ -112,33 +132,45 @@ class TargetBalance(Adversary):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model in a distillation manner.')
+    parser = argparse.ArgumentParser(
+        description="Train a model in a distillation manner."
+    )
     # Required arguments
-    parser_dealer(parser, 'blackbox')
-    parser_dealer(parser, 'sampling')
-    parser_dealer(parser, 'train')
-    parser_dealer(parser, 'common')
-    parser.add_argument('--method', metavar='M', type=str, help='Determine sample/synthetic method.',
-                        default='CW', choices=['CW', 'untargeted'])
+    parser_dealer(parser, "blackbox")
+    parser_dealer(parser, "sampling")
+    parser_dealer(parser, "train")
+    parser_dealer(parser, "common")
+    parser.add_argument(
+        "--method",
+        metavar="M",
+        type=str,
+        help="Determine sample/synthetic method.",
+        default="CW",
+        choices=["CW", "untargeted"],
+    )
     args = parser.parse_args()
     setup_seed(0)
-    adversary = TargetBalance(args, test=True)
+    adversary = TargetBalance(args, test=False)
     selecting = np.random.permutation(len(adversary.sampler.dataset))[:1000]
     labels = adversary.query_tensor(QueryWrapper(adversary.sampler.dataset, selecting))
     adversary.sampler.extend(selecting, labels)
     adversary.train()
-    for i in range(10):
+    for i in range(48):
         adversary.choose(500)
         # todo this line should be rechecked once the test argument is removed.
-        np.save(os.path.join(adversary.model.model_dir, 'selected_.npy'),
-                adversary.sampler.dataset.convert_indices(adversary.sampler.indices))
+        np.save(
+            os.path.join(adversary.model.model_dir, "selected_.npy"),
+            adversary.sampler.indices,
+        )
         # np.save(os.path.join(adversary.model.model_dir, 'synthetic_.npy'),
         #         [(tensor.numpy(), result.numpy()) for tensor, result in adversary.synthetic])
 
-        np.save(os.path.join(adversary.model.model_dir, 'statistic_matrix_.npy'), adversary.statistic)
+        np.save(
+            os.path.join(adversary.model.model_dir, "statistic_matrix_.npy"),
+            adversary.statistic,
+        )
         adversary.train()
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -2,18 +2,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-__all__ = ['Inversion']
+__all__ = ["Inversion"]
 
 
 class Inversion(nn.Module):
     def __init__(
-            self,
-            channel: int = 1,
-            num_classes: int = 10,
-            truncation: int = 10,
-            c: float = 50.,
-            complexity: int = 64,
-            **params
+        self,
+        channel: int = 1,
+        num_classes: int = 10,
+        truncation: int = 10,
+        c: float = 50.0,
+        complexity: int = 64,
+        **params
     ):
         super(Inversion, self).__init__()
 

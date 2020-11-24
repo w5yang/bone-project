@@ -2,11 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-__all__ = ['Classifier']
+__all__ = ["Classifier"]
 
 
 class Classifier(nn.Module):
-    def __init__(self, channel: int = 1, num_classes: int = 10, complexity: int = 64, **kwargs):
+    def __init__(
+        self, channel: int = 1, num_classes: int = 10, complexity: int = 64, **kwargs
+    ):
         super(Classifier, self).__init__()
 
         self.channel = channel

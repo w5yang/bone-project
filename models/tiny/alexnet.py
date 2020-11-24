@@ -1,15 +1,14 @@
-'''AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
+"""AlexNet for CIFAR10. FC layers are removed. Paddings are adjusted.
 Without BN, the start learning rate should be 0.01
 (c) YANG, Wei 
-'''
+"""
 import torch.nn as nn
 
 
-__all__ = ['alexnet']
+__all__ = ["alexnet"]
 
 
 class AlexNet(nn.Module):
-
     def __init__(self, num_classes=10):
         super(AlexNet, self).__init__()
         self.features = nn.Sequential(

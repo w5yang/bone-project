@@ -3,6 +3,7 @@ import os.path as osp
 import random
 
 from typing import List, Tuple, Union, Sequence
+
 # from overloading import overload
 import torch
 import torch.nn as nn
@@ -38,17 +39,23 @@ class Subset(Dataset):
 
     """
 
-    def __init__(self, dataset: Dataset, indices: Sequence, num_classes: int = -1, state_path: str = None):
+    def __init__(
+        self,
+        dataset: Dataset,
+        indices: Sequence,
+        num_classes: int = -1,
+        state_path: str = None,
+    ):
         self.state_path = state_path
         self.dataset = dataset
-        if hasattr(dataset, 'dataset_name'):
+        if hasattr(dataset, "dataset_name"):
             self.dataset_name = dataset.dataset_name
         else:
             self.dataset_name = dataset.__class__.__name__
         if len(set(indices)) == len(indices):
             self.indices = list(indices)
         else:
-            warnings.warn('There is duplication in initial indices!', UserWarning)
+            warnings.warn("There is duplication in initial indices!", UserWarning)
             # maintain the order of indices
             tempset = set()
             self.indices = []
@@ -57,10 +64,12 @@ class Subset(Dataset):
                     self.indices.append(i)
                     tempset.add(i)
         if num_classes == -1:
-            if hasattr(dataset, 'classes'):
+            if hasattr(dataset, "classes"):
                 self.num_classes = len(dataset.classes)
             else:
-                raise Exception("The num_classes should be specified if the dataset doesn't own classes attribute.")
+                raise Exception(
+                    "The num_classes should be specified if the dataset doesn't own classes attribute."
+                )
         else:
             self.num_classes = num_classes
         if hasattr(dataset, "samples"):
@@ -76,14 +85,14 @@ class Subset(Dataset):
         return len(self.indices)
 
     def samples(self, idx: int):
-        if hasattr(self, 'samples'):
+        if hasattr(self, "samples"):
             return self.__samples[self.indices[idx]]
         else:
             return None
 
     def append(self, index, *args, **kwargs):
         if index in self.indices:
-            warnings.warn('Duplicated index')
+            warnings.warn("Duplicated index")
             return
         else:
             self.indices.append(index)
@@ -96,7 +105,7 @@ class Subset(Dataset):
                 self.indices.append(i)
                 tempset.add(i)
             elif not warned:
-                warnings.warn('There is duplication in extended list')
+                warnings.warn("There is duplication in extended list")
                 warned = True
 
     def convert_indices(self, indices) -> List:
@@ -107,10 +116,10 @@ class Subset(Dataset):
 
     @classmethod
     def from_args(cls, args: Namespace):
-        """ This method get params from parser and return neccesary state.
+        """This method get params from parser and return neccesary state.
 
-            :param args: Parser that has parsed state params.
-            """
+        :param args: Parser that has parsed state params.
+        """
         try:
             sampleset = args.sampleset
             load_state = args.load_state
@@ -119,7 +128,9 @@ class Subset(Dataset):
             directory = args.model_dir
             input_size = args.input_size
         except AttributeError:
-            raise AttributeError("State params or model directory/input size not specified.")
+            raise AttributeError(
+                "State params or model directory/input size not specified."
+            )
         dataset = initial_dataset(sampleset, input_size, train=True)
         if load_state:
             return load_selection_state(dataset, directory, state_suffix, budget)
@@ -142,13 +153,14 @@ class Complement(Subset):
         indice_set = set([i for i in range(len(subset.dataset))])
         indice_set.difference_update(subset.indices)
         indices = list(indice_set)
-        super(Complement, self).__init__(subset.dataset, indices, subset.num_classes, subset.state_path)
+        super(Complement, self).__init__(
+            subset.dataset, indices, subset.num_classes, subset.state_path
+        )
 
 
 class Queryset(Dataset):
-
     def __init__(self, dataset, labels):
-        if hasattr(dataset, 'dataset_name'):
+        if hasattr(dataset, "dataset_name"):
             self.dataset_name = dataset.dataset_name
         else:
             self.dataset_name = dataset.__class__.__name__
@@ -164,12 +176,12 @@ class Queryset(Dataset):
 
 class QuerySubset(Subset):
     def __init__(
-            self,
-            dataset: Dataset,
-            indices: Sequence,
-            labels: Sequence,
-            num_classes: int = -1,
-            state_path: str = None
+        self,
+        dataset: Dataset,
+        indices: Sequence,
+        labels: Sequence,
+        num_classes: int = -1,
+        state_path: str = None,
     ):
         self.labels = list(labels)
         super(QuerySubset, self).__init__(dataset, indices, num_classes, state_path)
@@ -200,7 +212,7 @@ class QuerySubset(Subset):
                 self.labels.append(label)
                 tempset.add(i)
             elif not warned:
-                warnings.warn('There is duplication in extended list')
+                warnings.warn("There is duplication in extended list")
                 warned = True
 
     def append(self, index, label=None, *args, **kwargs):
@@ -208,7 +220,7 @@ class QuerySubset(Subset):
             self.indices.append(index)
         else:
             if index in self.indices:
-                warnings.warn('Duplication index')
+                warnings.warn("Duplication index")
                 return
             self.indices.append(index)
             self.__indices.append(index)
@@ -223,9 +235,9 @@ class PseudoBlackbox(object):
         :param argmax:
         """
         if isinstance(target, str):
-            with open(os.path.join(target, 'train.pickle'), 'rb') as f:
+            with open(os.path.join(target, "train.pickle"), "rb") as f:
                 self.train_results = pickle.load(f)
-            with open(os.path.join(target, 'eval.pickle'), 'rb') as f:
+            with open(os.path.join(target, "eval.pickle"), "rb") as f:
                 eval_results = pickle.load(f)
             self.eval_results = [r.argmax() for r in eval_results]
             self.is_dataset = False
@@ -254,7 +266,7 @@ class PseudoBlackbox(object):
 class QueryWrapper(object):
     def __init__(self, dataset: Dataset, indices=None):
         self.dataset = dataset
-        if hasattr(dataset, 'dataset_name'):
+        if hasattr(dataset, "dataset_name"):
             self.dataset_name = dataset.dataset_name
         else:
             self.dataset_name = dataset.__class__.__name__
@@ -279,9 +291,9 @@ BlackboxType = Union[Blackbox, nn.Module]
 def device_dealer(device_id: int) -> torch.device:
     if device_id >= 0:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(device_id)
-        device = torch.device('cuda:0')
+        device = torch.device("cuda:0")
     else:
-        device = torch.device('cpu')
+        device = torch.device("cpu")
     return device
 
 
@@ -296,66 +308,200 @@ def parser_dealer(parser: ArgumentParser, option: str):
     }
     """
 
-    if option == 'sampling':
-        parser.add_argument('sampleset', metavar='DS_NAME', type=str,
-                            help='Name of sample dataset in active learning selecting algorithms')
-        parser.add_argument('--load-state', action='store_true', default=False, help='Turn on if load state.')
-        parser.add_argument('--state-suffix', metavar='SE', type=str,
-                            help='load selected samples from sample set', required=False, default='')
-        parser.add_argument('--partial', metavar='N', type=int, help='load partial set of sample set', default=-1)
-    if option == 'blackbox':
-        parser.add_argument('blackbox_dir', metavar='VIC_DIR', type=str,
-                            help='Path to victim model. Should contain files "model_best.pth.tar" and "params.json"')
-        parser.add_argument('--argmax', action='store_true', help='Only consider argmax labels', default=False)
-        parser.add_argument('--pseudoblackbox', action='store_true', help='Load prequeried labels as blackbox',
-                            default=False)
-        parser.add_argument('--bydataset', action='store_true', help='Load prequeried labels as blackbox',
-                            default=False)
-        parser.add_argument('--topk', metavar='TK', type=int, help='iteration times',
-                            default=0)
-    if option == 'train':
-        parser.add_argument('model_dir', metavar='MODEL_DIR', type=str,
-                            help='Destination directory of model to be trained')
-        parser.add_argument('model_arch', metavar='MODEL_ARCH', type=str, help='Model name')
-        parser.add_argument('input_size', metavar='MODEL_SIZE', type=int, help='The size of input image.',
-                            choices=(32, 224))
-        parser.add_argument('dataset', metavar='DS_NAME', type=str,
-                            help='Name of test dataset. In the case of victim model training, '
-                                 'this parameter refer to both training set and test set')
+    if option == "sampling":
+        parser.add_argument(
+            "sampleset",
+            metavar="DS_NAME",
+            type=str,
+            help="Name of sample dataset in active learning selecting algorithms",
+        )
+        parser.add_argument(
+            "--load-state",
+            action="store_true",
+            default=False,
+            help="Turn on if load state.",
+        )
+        parser.add_argument(
+            "--state-suffix",
+            metavar="SE",
+            type=str,
+            help="load selected samples from sample set",
+            required=False,
+            default="",
+        )
+        parser.add_argument(
+            "--partial",
+            metavar="N",
+            type=int,
+            help="load partial set of sample set",
+            default=-1,
+        )
+    if option == "blackbox":
+        parser.add_argument(
+            "blackbox_dir",
+            metavar="VIC_DIR",
+            type=str,
+            help='Path to victim model. Should contain files "model_best.pth.tar" and "params.json"',
+        )
+        parser.add_argument(
+            "--argmax",
+            action="store_true",
+            help="Only consider argmax labels",
+            default=False,
+        )
+        parser.add_argument(
+            "--pseudoblackbox",
+            action="store_true",
+            help="Load prequeried labels as blackbox",
+            default=False,
+        )
+        parser.add_argument(
+            "--bydataset",
+            action="store_true",
+            help="Load prequeried labels as blackbox",
+            default=False,
+        )
+        parser.add_argument(
+            "--topk", metavar="TK", type=int, help="iteration times", default=0
+        )
+    if option == "train":
+        parser.add_argument(
+            "model_dir",
+            metavar="MODEL_DIR",
+            type=str,
+            help="Destination directory of model to be trained",
+        )
+        parser.add_argument(
+            "model_arch", metavar="MODEL_ARCH", type=str, help="Model name"
+        )
+        parser.add_argument(
+            "input_size",
+            metavar="MODEL_SIZE",
+            type=int,
+            help="The size of input image.",
+            choices=(32, 224),
+        )
+        parser.add_argument(
+            "dataset",
+            metavar="DS_NAME",
+            type=str,
+            help="Name of test dataset. In the case of victim model training, "
+            "this parameter refer to both training set and test set",
+        )
         # Optional arguments
-        parser.add_argument('-e', '--epochs', type=int, default=100, metavar='N',
-                            help='number of epochs to train (default: 100)')
+        parser.add_argument(
+            "-e",
+            "--epochs",
+            type=int,
+            default=100,
+            metavar="N",
+            help="number of epochs to train (default: 100)",
+        )
         # This is only useful when the model support this complexity settings
-        parser.add_argument('-x', '--complexity', type=int, default=-1, metavar='N',
-                            help="Model conv channel size.")
-        parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                            help='learning rate (default: 0.01)')
-        parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
-                            help='SGD momentum (default: 0.5)')
-        parser.add_argument('--log-interval', type=int, default=50, metavar='N',
-                            help='how many batches to wait before logging training status')
-        parser.add_argument('--resume', default=None, type=str, metavar='PATH',
-                            help='path to latest checkpoint (default: none)')
-        parser.add_argument('--lr-step', type=int, default=60, metavar='N',
-                            help='Step sizes for LR')
-        parser.add_argument('--lr-gamma', type=float, default=0.1, metavar='N',
-                            help='LR Decay Rate')
-        parser.add_argument('--pretrained', type=str, help='Use pretrained network', default=None)
-        parser.add_argument('--weighted-loss', action='store_true', help='Use a weighted loss', default=False)
-        parser.add_argument('--optimizer-choice', type=str, help='Optimizer', default='sgdm',
-                            choices=('sgd', 'sgdm', 'adam', 'adagrad'))
-        parser.add_argument('--train-criterion', type=str, help='Loss Function of training process', default='SCE',
-                            choices=['MSE', 'CE', 'L1', 'NLL', 'BCE', 'SmoothL1', 'SCE'])
-        parser.add_argument('--test-criterion', type=str, help='Loss Function of test process', default='CE',
-                            choices=['MSE', 'CE', 'L1', 'NLL', 'BCE', 'SmoothL1'])
-        parser.add_argument('--reduction', type=str, help='Loss Function reduction type', default='mean',
-                            choices=['mean', 'sum'])
-    if option == 'common':
-        parser.add_argument('-b', '--batch-size', type=int, default=64, metavar='N',
-                            help='input batch size for training (default: 64)')
-        parser.add_argument('-d', '--device-id', metavar='D', type=int, help='Device id. -1 for CPU.', default=0)
-        parser.add_argument('-w', '--num-workers', metavar='N', type=int, help='# Worker threads to load data',
-                            default=10)
+        parser.add_argument(
+            "-x",
+            "--complexity",
+            type=int,
+            default=-1,
+            metavar="N",
+            help="Model conv channel size.",
+        )
+        parser.add_argument(
+            "--lr",
+            type=float,
+            default=0.01,
+            metavar="LR",
+            help="learning rate (default: 0.01)",
+        )
+        parser.add_argument(
+            "--momentum",
+            type=float,
+            default=0.5,
+            metavar="M",
+            help="SGD momentum (default: 0.5)",
+        )
+        parser.add_argument(
+            "--log-interval",
+            type=int,
+            default=50,
+            metavar="N",
+            help="how many batches to wait before logging training status",
+        )
+        parser.add_argument(
+            "--resume",
+            default=None,
+            type=str,
+            metavar="PATH",
+            help="path to latest checkpoint (default: none)",
+        )
+        parser.add_argument(
+            "--lr-step", type=int, default=60, metavar="N", help="Step sizes for LR"
+        )
+        parser.add_argument(
+            "--lr-gamma", type=float, default=0.1, metavar="N", help="LR Decay Rate"
+        )
+        parser.add_argument(
+            "--pretrained", type=str, help="Use pretrained network", default=None
+        )
+        parser.add_argument(
+            "--weighted-loss",
+            action="store_true",
+            help="Use a weighted loss",
+            default=False,
+        )
+        parser.add_argument(
+            "--optimizer-choice",
+            type=str,
+            help="Optimizer",
+            default="sgdm",
+            choices=("sgd", "sgdm", "adam", "adagrad"),
+        )
+        parser.add_argument(
+            "--train-criterion",
+            type=str,
+            help="Loss Function of training process",
+            default="SCE",
+            choices=["MSE", "CE", "L1", "NLL", "BCE", "SmoothL1", "SCE"],
+        )
+        parser.add_argument(
+            "--test-criterion",
+            type=str,
+            help="Loss Function of test process",
+            default="CE",
+            choices=["MSE", "CE", "L1", "NLL", "BCE", "SmoothL1"],
+        )
+        parser.add_argument(
+            "--reduction",
+            type=str,
+            help="Loss Function reduction type",
+            default="mean",
+            choices=["mean", "sum"],
+        )
+    if option == "common":
+        parser.add_argument(
+            "-b",
+            "--batch-size",
+            type=int,
+            default=64,
+            metavar="N",
+            help="input batch size for training (default: 64)",
+        )
+        parser.add_argument(
+            "-d",
+            "--device-id",
+            metavar="D",
+            type=int,
+            help="Device id. -1 for CPU.",
+            default=0,
+        )
+        parser.add_argument(
+            "-w",
+            "--num-workers",
+            metavar="N",
+            type=int,
+            help="# Worker threads to load data",
+            default=10,
+        )
 
 
 def initial_dataset(dataset_name, input_size, train=True):
@@ -366,13 +512,13 @@ def initial_dataset(dataset_name, input_size, train=True):
 
 
 def query(
-        blackbox: BlackboxType,
-        samples: Sequence[Tensor],
-        budget: int = -1,
-        argmax: bool = False,
-        batch_size: int = 1024,
-        device: Device = Device('cpu'),
-        topk: int = 0,
+    blackbox: BlackboxType,
+    samples: Sequence[Tensor],
+    budget: int = -1,
+    argmax: bool = False,
+    batch_size: int = 1024,
+    device: Device = Device("cpu"),
+    topk: int = 0,
 ) -> List:
     """Query blackbox with a list of examples.
 
@@ -405,13 +551,13 @@ def query(
 
 
 def query_dataset(
-        blackbox: Union[Blackbox, nn.Module, PseudoBlackbox],
-        dataset: DatasetType,
-        list_indices: List[int] = None,
-        topk: int = 0,
-        argmax: bool = False,
-        batch_size: int = 1024,
-        device: Device = Device('cpu')
+    blackbox: Union[Blackbox, nn.Module, PseudoBlackbox],
+    dataset: DatasetType,
+    list_indices: List[int] = None,
+    topk: int = 0,
+    argmax: bool = False,
+    batch_size: int = 1024,
+    device: Device = Device("cpu"),
 ) -> Queryset:
     """This dataset is designed to query blackbox for the whole dataset, and return the result as dataset type.
 
@@ -459,7 +605,7 @@ def query_dataset(
 
 def load_transferset(path: str, topk: int = 0, argmax: bool = False) -> (List, int):
     assert os.path.exists(path)
-    with open(path, 'rb') as rf:
+    with open(path, "rb") as rf:
         samples = pickle.load(rf)
     if argmax:
         results = [(item[0], int(item[1].argmax())) for item in samples]
@@ -475,8 +621,10 @@ def load_transferset(path: str, topk: int = 0, argmax: bool = False) -> (List, i
     return results, num_classes
 
 
-def save_selection_state(data: Subset, state_dir: str, suffix: str = "", budget: int = -1) -> None:
-    """ All selection state is maintained by Subset class. A QuerySubset Class is acceptable as well.
+def save_selection_state(
+    data: Subset, state_dir: str, suffix: str = "", budget: int = -1
+) -> None:
+    """All selection state is maintained by Subset class. A QuerySubset Class is acceptable as well.
 
     :param data: A subset object contains indices.
     :param state_dir: Specify the save dir.
@@ -489,48 +637,66 @@ def save_selection_state(data: Subset, state_dir: str, suffix: str = "", budget:
     else:
         os.mkdir(state_dir)
     if budget > 0:
-        label_path = os.path.join(state_dir, 'labels{}.pickle'.format(suffix))
-        selected_indices_list_path = os.path.join(state_dir, 'selected_indices{}.pickle'.format(suffix))
+        label_path = os.path.join(state_dir, "labels{}.pickle".format(suffix))
+        selected_indices_list_path = os.path.join(
+            state_dir, "selected_indices{}.pickle".format(suffix)
+        )
     else:
-        label_path = os.path.join(state_dir, 'labels{}.pickle'.format(suffix))
-        selected_indices_list_path = os.path.join(state_dir, 'selected_indices{}.pickle'.format(suffix))
+        label_path = os.path.join(state_dir, "labels{}.pickle".format(suffix))
+        selected_indices_list_path = os.path.join(
+            state_dir, "selected_indices{}.pickle".format(suffix)
+        )
 
-    if hasattr(data, 'labels'):  # QuerySubset
+    if hasattr(data, "labels"):  # QuerySubset
         if os.path.exists(label_path):
-            print('Override previous transferset => {}'.format(label_path))
-        with open(label_path, 'wb') as tfp:
+            print("Override previous transferset => {}".format(label_path))
+        with open(label_path, "wb") as tfp:
             pickle.dump(data.labels, tfp)
         print("=> selected {} samples written to {}".format(len(data), label_path))
 
     if os.path.exists(selected_indices_list_path):
         print("{} exists, override file.".format(selected_indices_list_path))
-    with open(selected_indices_list_path, 'wb') as lfp:
+    with open(selected_indices_list_path, "wb") as lfp:
         pickle.dump(data.indices, lfp)
-    print("=> selected {} samples written to {}".format(len(data), selected_indices_list_path))
+    print(
+        "=> selected {} samples written to {}".format(
+            len(data), selected_indices_list_path
+        )
+    )
 
 
-def load_selection_state(queryset, state_dir: str, selection_suffix: str = '', budget: int = -1):
-    label_path = os.path.join(state_dir, 'labels{}.pickle'.format(selection_suffix))
-    indices_list_path = os.path.join(state_dir, 'selected_indices{}.pickle'.format(selection_suffix))
-    with open(indices_list_path, 'rb') as lf:
+def load_selection_state(
+    queryset, state_dir: str, selection_suffix: str = "", budget: int = -1
+):
+    label_path = os.path.join(state_dir, "labels{}.pickle".format(selection_suffix))
+    indices_list_path = os.path.join(
+        state_dir, "selected_indices{}.pickle".format(selection_suffix)
+    )
+    with open(indices_list_path, "rb") as lf:
         indices = pickle.load(lf)
         assert isinstance(indices, List)
         if budget > 0:
             indices = indices[:budget]
-        print("=> load selected {} sample indices from {}".format(len(indices), indices_list_path))
+        print(
+            "=> load selected {} sample indices from {}".format(
+                len(indices), indices_list_path
+            )
+        )
     if os.path.exists(label_path):
-        with open(label_path, 'rb') as tf:
+        with open(label_path, "rb") as tf:
             labels = pickle.load(tf)
             assert isinstance(labels, List)
             if budget > 0:
                 labels = labels[:budget]
             print("=> load selected {} samples from {}".format(len(labels), label_path))
-        return QuerySubset(queryset, indices, labels, len(queryset.classes), state_path=state_dir)
+        return QuerySubset(
+            queryset, indices, labels, len(queryset.classes), state_path=state_dir
+        )
     return Subset(queryset, indices, state_path=state_dir)
 
 
 def save_npimg(array: np.ndarray, path: str) -> None:
-    """ Save numpy array to image file.
+    """Save numpy array to image file.
 
     :param array: img array
     :param path: path including corresponding extension
@@ -575,7 +741,7 @@ def naive_onehot(index: int, total: int) -> Tensor:
 
 def create_dir(dir_path):
     if not osp.exists(dir_path):
-        print('Path {} does not exist. Creating it...'.format(dir_path))
+        print("Path {} does not exist. Creating it...".format(dir_path))
         os.makedirs(dir_path)
 
 
