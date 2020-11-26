@@ -126,7 +126,9 @@ class TargetBalance(Adversary):
                 sorted_indices = perturbation_array.argsort()
                 self.punished.add(current_index)
         real_chosen = selecting_pool.convert_indices(chosen)
-        labels = self.query_tensor(QueryWrapper(self.sampler.dataset, real_chosen))
+        labels = self.query_tensor(
+            QueryWrapper(self.sampler.dataset, real_chosen, self.blackbox.transform)
+        )
         self.sampler.extend(real_chosen, labels)
         self.update_penalty_matrix()
 

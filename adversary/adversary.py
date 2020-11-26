@@ -5,6 +5,7 @@ import numpy as np
 from overloading import overload
 from torch import Tensor
 from torch.utils.data import Dataset
+import torch
 
 from utils.common import (
     query,
@@ -35,22 +36,24 @@ class Adversary(object):
             self.blackbox = PseudoBlackbox(args.blackbox_dir, args.argmax)
         elif args.argmax:
             self.blackbox = Blackbox.from_modeldir(
-                args.blackbox_dir, device=self.device, topk=1, rounding=0
+                args.blackbox_dir, device=torch.device("cpu"), topk=1, rounding=0
             )
         elif args.topk != 0:
             self.blackbox = Blackbox.from_modeldir(
-                args.blackbox_dir, device=self.device, topk=args.topk
+                args.blackbox_dir, device=torch.device("cpu"), topk=args.topk
             )
         else:
             self.blackbox = Blackbox.from_modeldir(
-                args.blackbox_dir, device=self.device
+                args.blackbox_dir, device=torch.device("cpu")
             )
 
     def query_tensor(self, x: Union[Sequence[Tensor], QueryWrapper]) -> List:
         if isinstance(self.blackbox, PseudoBlackbox):
             raise NotImplementedError
         else:
-            return query(self.blackbox, x, device=self.device)
+            return query(self.blackbox, x, device=torch.device("cpu"))
+
+    # def query_indices(self, x: Sequence[int]):
 
     def train(self, samples=None):
         self.model = Model(device=self.device, **self.params)
@@ -67,7 +70,9 @@ class Adversary(object):
             selecting = np.random.permutation(unselected)[:budget]
             if isinstance(self.sampler, QuerySubset):
                 results = self.query_tensor(
-                    QueryWrapper(self.sampler.dataset, selecting)
+                    QueryWrapper(
+                        self.sampler.dataset, selecting, self.blackbox.transform
+                    )
                 )
                 self.sampler.extend(selecting, results)
         else:

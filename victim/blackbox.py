@@ -7,6 +7,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from models import sized_transforms
 from utils.type_checks import TypeCheck
 import models.zoo as zoo
 
@@ -17,13 +18,15 @@ __status__ = "Development"
 
 
 class Blackbox(object):
-    def __init__(self, model, device=None, topk=None, rounding=None):
+    def __init__(self, model, device=None, topk=None, rounding=None, input_size=32):
         self.device = torch.device("cuda") if device is None else device
         self.topk = topk
         self.rounding = rounding
 
         self.__model = model.to(device)
         self.__model.eval()
+        self.input_size = input_size
+        self.transform = sized_transforms[input_size]
 
         self.__call_count = 0
 
@@ -49,6 +52,7 @@ class Blackbox(object):
             num_classes=num_classes,
             channel=channel,
             complexity=complexity,
+            input_size=input_size,
         )
         model = model.to(device)
 

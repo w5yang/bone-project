@@ -28,6 +28,18 @@ from torchvision import transforms
 from argparse import ArgumentParser, Namespace
 
 
+class PureSubset(object):
+    def __init__(self, data: Sequence, indices: Sequence[int]):
+        self.data = data
+        self.indices = indices
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, item):
+        return self.data[self.indices[item]]
+
+
 class Subset(Dataset):
     r"""
     Subset of a dataset at specified indices.
@@ -42,7 +54,7 @@ class Subset(Dataset):
     def __init__(
         self,
         dataset: Dataset,
-        indices: Sequence,
+        indices: Sequence[int],
         num_classes: int = -1,
         state_path: str = None,
     ):
@@ -74,6 +86,7 @@ class Subset(Dataset):
             self.num_classes = num_classes
         if hasattr(dataset, "samples"):
             self.__samples = dataset.samples
+            self.samples = PureSubset(dataset.samples, self.indices)
         if hasattr(dataset, "classes"):
             self.classes = dataset.classes
 
@@ -84,11 +97,11 @@ class Subset(Dataset):
     def __len__(self):
         return len(self.indices)
 
-    def samples(self, idx: int):
-        if hasattr(self, "samples"):
-            return self.__samples[self.indices[idx]]
-        else:
-            return None
+    # def samples(self, idx: int):
+    #     if hasattr(self, "samples"):
+    #         return self.__samples[self.indices[idx]]
+    #     else:
+    #         return None
 
     def append(self, index, *args, **kwargs):
         if index in self.indices:
@@ -264,8 +277,9 @@ class PseudoBlackbox(object):
 
 
 class QueryWrapper(object):
-    def __init__(self, dataset: Dataset, indices=None):
+    def __init__(self, dataset: Dataset, indices=None, transform=None):
         self.dataset = dataset
+        self.transform = transform
         if hasattr(dataset, "dataset_name"):
             self.dataset_name = dataset.dataset_name
         else:
@@ -279,8 +293,17 @@ class QueryWrapper(object):
         return len(self.indices)
 
     def __getitem__(self, item):
-        i = self.indices[item]
-        return self.dataset[i][0]
+
+        if self.transform is not None and hasattr(self.dataset, "samples"):
+            item = self.transform(self.dataset.samples[self.indices[item]][0])
+        elif self.transform is not None:
+            i = self.indices[item]
+            item = self.dataset[item][0]
+
+        else:
+            i = self.indices[item]
+            item = self.dataset[i][0]
+        return item
 
 
 # typing
@@ -476,6 +499,9 @@ def parser_dealer(parser: ArgumentParser, option: str):
             help="Loss Function reduction type",
             default="mean",
             choices=["mean", "sum"],
+        )
+        parser.add_argument(
+            "--freeze", type=bool, help="Freeze the feature layers", default=False
         )
     if option == "common":
         parser.add_argument(

@@ -7,6 +7,7 @@ import warnings
 from collections import defaultdict as dd
 from datetime import datetime
 import os
+from typing import overload, Sequence
 
 import numpy as np
 import torch
@@ -18,6 +19,8 @@ from torch.utils.data import DataLoader, Dataset
 import utils.common as common_utils
 from datasets import get_dataset
 from models import zoo
+from PIL.Image import Image as ImageType
+from models import sized_transforms
 
 
 def get_optimizer(parameters, optimizer_type, lr=0.01, momentum=0.5, **kwargs):
@@ -339,6 +342,7 @@ class Model(object):
         train_criterion: str = "CE",
         test_criterion: str = "CE",
         reduction: str = "mean",
+        freeze: bool = False,
         **kwargs
     ):
         self.testset = get_dataset(dataset, input_size, False)
@@ -390,10 +394,13 @@ class Model(object):
         self.model_dir = model_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.transform = sized_transforms[input_size]
 
         self.train_criterion = get_criterion(train_criterion, reduction)
         self.test_criterion = get_criterion(test_criterion, reduction)
         self.weighted_loss = weighted_loss
+        if freeze and (model_arch in ("vgg19", "vgg19_bn")):
+            self.model._features.requires_grad_(False)
         if device is not None:
             self.device = device
         else:
@@ -575,7 +582,8 @@ class Model(object):
                 test_cols = [run_id, epoch, "test", test_loss, test_acc, best_test_acc]
                 af.write("\t".join([str(c) for c in test_cols]) + "\n")
 
-    def __call__(self, x):
+    @overload
+    def __call__(self, x: torch.Tensor):
         """This calling method is specially designed for model evaluation.
 
         Args:
@@ -586,6 +594,10 @@ class Model(object):
         """
         self.model.eval()
         return self.model(x)
+
+    def __call__(self, x: Sequence[ImageType]):
+        x = torch.stack([self.transform(img) for img in x])
+        self.__call__(x)
 
     def forward(self, x):
         return self.model.forward(x)
