@@ -2,7 +2,7 @@ import os
 import os.path as osp
 import random
 
-from typing import List, Tuple, Union, Sequence
+from typing import List, Tuple, Union, Sequence, Callable
 
 # from overloading import overload
 import torch
@@ -583,6 +583,7 @@ def query_dataset(
     topk: int = 0,
     argmax: bool = False,
     batch_size: int = 1024,
+    transform: Callable = None,
     device: Device = Device("cpu"),
 ) -> Queryset:
     """This dataset is designed to query blackbox for the whole dataset, and return the result as dataset type.
@@ -593,8 +594,13 @@ def query_dataset(
     :param topk: return the vector with top-k labels
     :param argmax: return the class labels
     :param batch_size: batch size
+    :param transform: transform image
     :param device: calculation device, CPU as default
     :return: queryset type results, can be used as dataset
+
+    Args:
+        transform:
+        transform:
     """
     if list_indices is None:
         if isinstance(blackbox, PseudoBlackbox):
@@ -608,6 +614,9 @@ def query_dataset(
             return Queryset(subset, labels)
     labels = []
     dataset_size = len(subset)
+    if transform is not None:
+        previous_transform = dataset.transform
+        dataset.transform = transform
     loader = DataLoader(subset, batch_size, shuffle=False, num_workers=8)
     with tqdm(total=dataset_size) as pbar:
         for x_t, _ in loader:
@@ -626,6 +635,8 @@ def query_dataset(
             for i in range(x_t.size(0)):
                 labels.append(y_t[i].cpu())
             pbar.update(x_t.size(0))
+    if transform is not None:
+        dataset.transform = previous_transform
     return Queryset(subset, labels)
 
 
@@ -696,18 +707,18 @@ def load_selection_state(
 ):
     label_path = os.path.join(state_dir, "labels{}.pickle".format(selection_suffix))
     indices_list_path = os.path.join(
-        state_dir, "selected_indices{}.pickle".format(selection_suffix)
+        state_dir, "selected_indices{}.npy".format(selection_suffix)
     )
-    with open(indices_list_path, "rb") as lf:
-        indices = pickle.load(lf)
-        assert isinstance(indices, List)
-        if budget > 0:
-            indices = indices[:budget]
-        print(
-            "=> load selected {} sample indices from {}".format(
-                len(indices), indices_list_path
-            )
+
+    indices = np.load(indices_list_path)
+    assert isinstance(indices, List)
+    if budget > 0:
+        indices = indices[:budget]
+    print(
+        "=> load selected {} sample indices from {}".format(
+            len(indices), indices_list_path
         )
+    )
     if os.path.exists(label_path):
         with open(label_path, "rb") as tf:
             labels = pickle.load(tf)

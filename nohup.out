@@ -1,0 +1,106 @@
+[I 13:44:36.136 LabApp] JupyterLab extension loaded from /home/ubuntu/torchenv/lib/python3.7/site-packages/jupyterlab
+[I 13:44:36.136 LabApp] JupyterLab application directory is /home/ubuntu/torchenv/share/jupyter/lab
+[I 13:44:36.140 LabApp] Serving notebooks from local directory: /mnt/ywb/bone-project
+[I 13:44:36.140 LabApp] Jupyter Notebook 6.1.4 is running at:
+[I 13:44:36.140 LabApp] http://localhost:8888/?token=618d475f642f6ef6de4d344801f44ae19983c1f91584fadc
+[I 13:44:36.141 LabApp]  or http://127.0.0.1:8888/?token=618d475f642f6ef6de4d344801f44ae19983c1f91584fadc
+[I 13:44:36.141 LabApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 13:44:36.147 LabApp] No web browser found: could not locate runnable browser.
+[C 13:44:36.147 LabApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/ubuntu/.local/share/jupyter/runtime/nbserver-47644-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=618d475f642f6ef6de4d344801f44ae19983c1f91584fadc
+     or http://127.0.0.1:8888/?token=618d475f642f6ef6de4d344801f44ae19983c1f91584fadc
+[W 13:44:45.273 LabApp] Could not determine jupyterlab build status without nodejs
+[I 13:44:48.718 LabApp] Kernel started: ab5fd841-0f38-47dd-a043-a842bb6f7d12, name: python3
+[I 13:44:48.742 LabApp] Kernel started: 5c7d7150-324d-45e3-985e-97b0a6bd571b, name: python3
+[I 13:45:22.795 LabApp] Kernel restarted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 13:46:48.944 LabApp] Saving file at /train_from_selected.ipynb
+[I 13:48:49.961 LabApp] Saving file at /train_from_selected.ipynb
+[I 13:50:50.920 LabApp] Saving file at /train_from_selected.ipynb
+[I 13:52:51.938 LabApp] Saving file at /train_from_selected.ipynb
+[I 13:54:52.936 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:36:55.020 LabApp] Kernel restarted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 14:37:06.896 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:39:07.895 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:41:08.892 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:43:09.885 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:45:10.894 LabApp] Saving file at /train_from_selected.ipynb
+[I 14:47:11.901 LabApp] Saving file at /train_from_selected.ipynb
+[I 15:30:24.956 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:28.046 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:28.240 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:28.603 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:28.780 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:28.940 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:29.110 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:29.265 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:29.431 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:29.600 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:29.765 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:35.757 LabApp] Starting buffering for ab5fd841-0f38-47dd-a043-a842bb6f7d12:89beb5fd-9570-46ae-a3c9-1e5cfcf9c19e
+[I 15:30:35.761 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:efbe0c77-a4eb-4040-aecf-4cc85720e6ca
+[W 15:30:36.865 LabApp] Could not determine jupyterlab build status without nodejs
+[I 15:30:41.450 LabApp] Saving file at /train_from_selected.ipynb
+[I 15:30:42.180 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:42.722 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:42.908 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:43.077 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:43.240 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:43.416 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:43.612 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:44.166 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:47.387 LabApp] Kernel restarted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:47.453 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+Traceback (most recent call last):
+  File "/usr/local/python3.7/lib/python3.7/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/local/python3.7/lib/python3.7/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/ubuntu/torchenv/lib/python3.7/site-packages/ipykernel_launcher.py", line 15, in <module>
+    from ipykernel import kernelapp as app
+  File "/home/ubuntu/torchenv/lib/python3.7/site-packages/ipykernel/__init__.py", line 2, in <module>
+    from .connect import *
+  File "/home/ubuntu/torchenv/lib/python3.7/site-packages/ipykernel/connect.py", line 8, in <module>
+    import json
+  File "/usr/local/python3.7/lib/python3.7/json/__init__.py", line 106, in <module>
+    from .decoder import JSONDecoder, JSONDecodeError
+  File "/usr/local/python3.7/lib/python3.7/json/decoder.py", line 53, in <module>
+    STRINGCHUNK = re.compile(r'(.*?)(["\\\x00-\x1f])', FLAGS)
+  File "/usr/local/python3.7/lib/python3.7/re.py", line 234, in compile
+    return _compile(pattern, flags)
+  File "/usr/local/python3.7/lib/python3.7/re.py", line 286, in _compile
+    p = sre_compile.compile(pattern, flags)
+  File "/usr/local/python3.7/lib/python3.7/sre_compile.py", line 764, in compile
+    p = sre_parse.parse(p, flags)
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 924, in parse
+    p = _parse_sub(source, pattern, flags & SRE_FLAG_VERBOSE, 0)
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 420, in _parse_sub
+    not nested and not items))
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 810, in _parse
+    p = _parse_sub(source, state, sub_verbose, nested + 1)
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 420, in _parse_sub
+    not nested and not items))
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 544, in _parse
+    if sourcematch("-"):
+  File "/usr/local/python3.7/lib/python3.7/sre_parse.py", line 250, in match
+    if char == self.next:
+KeyboardInterrupt
+[I 15:30:48.167 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:48.353 LabApp] Kernel interrupted: 5c7d7150-324d-45e3-985e-97b0a6bd571b
+[I 15:30:50.131 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:b8ee8562-db99-44d1-af50-08ad8c32f6cc
+[I 15:30:50.388 LabApp] KernelRestarter: restarting kernel (1/5), keep random ports
+kernel 5c7d7150-324d-45e3-985e-97b0a6bd571b restarted
+[I 15:30:51.755 LabApp] Starting buffering for ab5fd841-0f38-47dd-a043-a842bb6f7d12:66337fab-3a89-4507-9adf-0890063fe657
+[I 15:30:51.757 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:a4c2e6e6-a9ad-47d0-9d46-b1aabe9375fe
+[I 02:48:29.771 LabApp] 302 GET /?token=c8effbe7fce9a4b40d76264f0e11984ed9fc6f00a97ab6f1 (::1) 2.45ms
+[W 02:48:31.089 LabApp] Could not determine jupyterlab build status without nodejs
+[I 02:48:32.031 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:43e142d7-ddc5-4583-b688-f04491dc7a24
+[I 04:05:22.072 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:439b93c9-5fd4-44c9-b74e-73509727062e
+[I 04:05:22.075 LabApp] Starting buffering for ab5fd841-0f38-47dd-a043-a842bb6f7d12:3e4a44a6-4aaa-4358-b253-916631140bcd
+[W 06:08:57.016 LabApp] Could not determine jupyterlab build status without nodejs
+[I 06:08:58.151 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:d2d9e3fe-03c7-4a80-8604-4a6974385664
+[I 07:21:52.017 LabApp] Starting buffering for ab5fd841-0f38-47dd-a043-a842bb6f7d12:18eed26e-6d82-41eb-a884-fea829f71472
+[I 07:21:52.019 LabApp] Starting buffering for 5c7d7150-324d-45e3-985e-97b0a6bd571b:6a810dd0-806a-4139-8371-e57a4e78744d

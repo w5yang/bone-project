@@ -1,4 +1,5 @@
 import torch.nn as nn
+from torch.nn.functional import softmax
 from collections import OrderedDict
 
 __all__ = ["cnn32", "cnn42"]
@@ -20,6 +21,7 @@ class CNN32(nn.Module):
         x = self.cb3(x)
         x = x.view(-1, 2048)
         x = self.fc(x)
+        x =softmax(x, dim=1)
 
         return x
 

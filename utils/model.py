@@ -7,7 +7,9 @@ import warnings
 from collections import defaultdict as dd
 from datetime import datetime
 import os
-from typing import overload, Sequence
+from typing import Sequence, List
+
+# from multipledispatch import dispatch
 
 import numpy as np
 import torch
@@ -367,9 +369,15 @@ class Model(object):
                 channel=channel,
                 complexity=complexity,
             ).to(device)
-        self.optimizer = get_optimizer(
-            self.model.parameters(), optimizer_choice, lr, momentum
-        )
+        if freeze and (model_arch in ("vgg19", "vgg19_bn")):
+            self.model.features.requires_grad_(False)
+            self.optimizer = get_optimizer(
+                self.model.classifier.parameters(), optimizer_choice, lr, momentum
+            )
+        else:
+            self.optimizer = get_optimizer(
+                self.model.parameters(), optimizer_choice, lr, momentum
+            )
         if resume is not None:
             if osp.isfile(resume):
                 print("=> loading checkpoint '{}'".format(resume))
@@ -399,8 +407,7 @@ class Model(object):
         self.train_criterion = get_criterion(train_criterion, reduction)
         self.test_criterion = get_criterion(test_criterion, reduction)
         self.weighted_loss = weighted_loss
-        if freeze and (model_arch in ("vgg19", "vgg19_bn")):
-            self.model._features.requires_grad_(False)
+
         if device is not None:
             self.device = device
         else:
@@ -582,7 +589,7 @@ class Model(object):
                 test_cols = [run_id, epoch, "test", test_loss, test_acc, best_test_acc]
                 af.write("\t".join([str(c) for c in test_cols]) + "\n")
 
-    @overload
+    # @dispatch(torch.Tensor)
     def __call__(self, x: torch.Tensor):
         """This calling method is specially designed for model evaluation.
 
@@ -595,9 +602,10 @@ class Model(object):
         self.model.eval()
         return self.model(x)
 
-    def __call__(self, x: Sequence[ImageType]):
-        x = torch.stack([self.transform(img) for img in x])
-        self.__call__(x)
+    # @dispatch(list)
+    # def __call__(self, x: Sequence[ImageType]):
+    #     x = torch.stack([self.transform(img) for img in x])
+    #     self.__call__(x)
 
     def forward(self, x):
         return self.model.forward(x)

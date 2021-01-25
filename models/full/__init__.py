@@ -31,6 +31,8 @@ from pretrainedmodels import vgg13_bn
 from pretrainedmodels import vgg16
 from pretrainedmodels import vgg16_bn
 from pretrainedmodels import vgg19_bn
+
+# from torchvision.models import vgg19_bn
 from pretrainedmodels import vgg19
 from pretrainedmodels import dpn68
 from pretrainedmodels import dpn68b

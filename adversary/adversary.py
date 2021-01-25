@@ -28,7 +28,10 @@ class Adversary(object):
         self.device = device_dealer(args.device_id)
         self.model = Model(device=self.device, **self.params)
         self.sampler = Subset.from_args(args)
-        self.method = args.method
+        if hasattr(args, "method"):
+            self.method = args.method
+        else:
+            self.method = kwargs["method"]
         if args.pseudoblackbox and args.bydataset:
             # This may work, but is poorly designed.
             self.blackbox = PseudoBlackbox(self.sampler.dataset, args.argmax)

@@ -54,7 +54,7 @@ class ImageNet64(Dataset):
         )
         data = data.reshape((data.shape[0], img_size, img_size, 3))
 
-        self.samples = [(data[i], labels[i]) for i in range(data.shape[0])]
+        self.samples = [(data[i], labels[i] - 1) for i in range(data.shape[0])]
 
     def __getitem__(self, index: int) -> tuple:
         """
