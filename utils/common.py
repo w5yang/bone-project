@@ -21,8 +21,8 @@ import os
 import warnings
 
 import numpy as np
-import imgaug as ia
-import imgaug.augmenters as iaa
+# import imgaug as ia
+# import imgaug.augmenters as iaa
 from PIL import Image
 from torchvision import transforms
 from argparse import ArgumentParser, Namespace
